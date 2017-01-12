@@ -15,6 +15,11 @@ use Shopware\Commands\ShopwareCommand;
 class BuildPluginCommand extends ShopwareCommand
 {
     /**
+     * @var OutputInterface
+     */
+    protected $output;
+
+    /**
      * @var SplFileInfo
      */
     protected $releaseDir;
@@ -47,6 +52,8 @@ class BuildPluginCommand extends ShopwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->output = $output;
+
         $pluginName = $input->getArgument('plugin');
 
         $this->releaseDir = new SplFileInfo(Shopware()->DocPath() .
@@ -58,7 +65,10 @@ class BuildPluginCommand extends ShopwareCommand
         $this->preparePlugin();
         $this->zipPlugin();
 
-        $output->writeln([
+        $this->output->writeln([
+            'Plugin successfully built.',
+            'Name: ' . $this->pluginDir->getBasename(),
+            'Version: ' . $this->pluginInfo['version'],
         ]);
     }
 
@@ -128,6 +138,8 @@ class BuildPluginCommand extends ShopwareCommand
         }
         $command .= ';';
 
+        ob_start();
         system($command);
+        $this->output->writeln(ob_get_clean());
     }
 }
