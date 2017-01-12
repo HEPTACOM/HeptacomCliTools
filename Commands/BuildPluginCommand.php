@@ -4,7 +4,6 @@ namespace HeptacomCliTools\Commands;
 
 use Exception;
 use SplFileInfo;
-use Symfony\Component\ClassLoader\Psr4ClassLoader;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -81,9 +80,6 @@ class BuildPluginCommand extends ShopwareCommand
      */
     protected function preparePlugin()
     {
-        $classLoader = new Psr4ClassLoader();
-        $classLoader->register(true);
-
         $pluginName = $this->pluginDir->getBasename();
         if (!is_file($this->pluginDir->getPathname() . DIRECTORY_SEPARATOR . $pluginName . '.php')) {
             throw new Exception('No plugin bootstrap file was found in ' . $this->pluginDir);
@@ -91,13 +87,6 @@ class BuildPluginCommand extends ShopwareCommand
         if (!is_file($this->pluginDir->getPathname() . DIRECTORY_SEPARATOR . 'plugin.xml')) {
             throw new Exception('No plugin.xml info file was found in ' . $this->pluginDir);
         }
-
-        $namespace = $pluginName;
-        $className = '\\' . $namespace . '\\' .  $pluginName;
-
-        $classLoader->addPrefix($namespace, $this->pluginDir->getPathname());
-
-        $this->bootstrap = new $className(false);
 
         /** @var XmlPluginInfoReader $pluginInfoReader */
         $pluginInfoReader = $this->getContainer()->get('shopware.plugin_xml_plugin_info_reader');
@@ -113,12 +102,9 @@ class BuildPluginCommand extends ShopwareCommand
      */
     protected function lintPlugin()
     {
-        $command = 'php -l ' . $this->pluginDir->getPathname() . DIRECTORY_SEPARATOR . $this->pluginDir->getBasename() . '.php';
-        $return_var = 0;
+        $command = PHP_BINARY . ' -l ' . $this->pluginDir->getPathname() . DIRECTORY_SEPARATOR . $this->pluginDir->getBasename() . '.php';
 
-        ob_start();
-        system($command, $return_var);
-        ob_clean();
+        exec($command, $output, $return_var);
 
         if ($return_var) {
             throw new Exception('Syntax error was detected in ' .
