@@ -5,7 +5,7 @@ namespace HeptacomCliTools;
 use Doctrine\Common\Collections\ArrayCollection;
 use Enlight_Event_EventArgs;
 use Shopware\Components\Plugin;
-use HeptacomCliTools\Commands\BuildPluginCommand;
+use HeptacomCliTools\Commands;
 
 class HeptacomCliTools extends Plugin
 {
@@ -19,7 +19,8 @@ class HeptacomCliTools extends Plugin
     public function addCommands(Enlight_Event_EventArgs $args)
     {
         return new ArrayCollection([
-            new BuildPluginCommand(),
+            new Commands\BuildPluginCommand(),
+            new Commands\BuildThemeCommand(),
         ]);
     }
 }
