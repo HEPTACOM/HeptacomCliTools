@@ -74,7 +74,7 @@ class BuildPluginCommand extends ShopwareCommand
         $this->zipPlugin();
 
         $this->output->writeln([
-            'Plugin successfully built.',
+            'Plugin built successfully.',
             'Name: ' . $this->pluginDir->getBasename(),
             'Version: ' . $this->pluginInfo['version'],
         ]);
@@ -110,12 +110,14 @@ class BuildPluginCommand extends ShopwareCommand
         $phpFiles = new RegexIterator($this->listFilesForZip(), "/^.+\.php$/i", RecursiveRegexIterator::GET_MATCH);
         
         foreach ($phpFiles as $phpFile) {
-            if (!static::lintPHPFile($phpFile[0], $_)) {
-                throw new Exception("Syntax error was detected in \"$phpFile[0]\"");
+            if (!static::lintPHPFile($phpFile[0], $output)) {
+                throw new Exception(
+                    sprintf('Syntax error was detected in "%s". Error message: %s %s', $phpFile[0], PHP_EOL, $output)
+                );
             }
         }
 
-        $this->output->writeln("Plugin linted successfully.");
+        $this->output->writeln('Plugin linted successfully.');
     }
 
     protected function zipPlugin()
@@ -151,7 +153,7 @@ class BuildPluginCommand extends ShopwareCommand
     private function listFilesForZip()
     {
         $files = new RecursiveDirectoryIterator($this->pluginDir->getPathname());
-        $filesFilter = new RecursiveCallbackFilterIterator($files, function ($item, $key, $iterator) {
+        $filesFilter = new RecursiveCallbackFilterIterator($files, function (SplFileInfo $item, $key, $iterator) {
             // hide "hidden" files
             if (strncmp($item->getFilename(), '.', 1) === 0) {
                 return false;
@@ -160,7 +162,7 @@ class BuildPluginCommand extends ShopwareCommand
             return true;
         });
 
-        return new \RecursiveIteratorIterator($filesFilter);
+        return new RecursiveIteratorIterator($filesFilter);
     }
 
     /**
