@@ -14,7 +14,8 @@ to come that we find useful for developers.
 
 ```heptacom:plugin:build <plugin>```
 
-This builds a zip file of a plugin. The plugin must follow the new
-plugin structure and has to be located in `custom/plugins/`. Also
-it has to have a valid plugin.xml file. The built zip file will be
-located in `HeptacomBuilds/plugins/`.
+This builds lints all php files and creates a zip file of the given
+plugin. The plugin must follow the new plugin structure and has to
+be located in `custom/plugins/`. Also it has to have a valid
+plugin.xml file. The built zip file will be located in
+`HeptacomBuilds/plugins/`.

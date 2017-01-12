@@ -3,6 +3,11 @@
 namespace HeptacomCliTools\Commands;
 
 use Exception;
+use RecursiveCallbackFilterIterator;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use RecursiveRegexIterator;
+use RegexIterator;
 use SplFileInfo;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -102,14 +107,15 @@ class BuildPluginCommand extends ShopwareCommand
      */
     protected function lintPlugin()
     {
-        $command = PHP_BINARY . ' -l ' . $this->pluginDir->getPathname() . DIRECTORY_SEPARATOR . $this->pluginDir->getBasename() . '.php';
-
-        exec($command, $output, $return_var);
-
-        if ($return_var) {
-            throw new Exception('Syntax error was detected in ' .
-                $this->pluginDir->getPathname() . DIRECTORY_SEPARATOR . $this->pluginDir->getBasename() . '.php');
+        $phpFiles = new RegexIterator($this->listFilesForZip(), "/^.+\.php$/i", RecursiveRegexIterator::GET_MATCH);
+        
+        foreach ($phpFiles as $phpFile) {
+            if (!static::lintPHPFile($phpFile[0], $_)) {
+                throw new Exception("Syntax error was detected in \"$phpFile[0]\"");
+            }
         }
+
+        $this->output->writeln("Plugin linted successfully.");
     }
 
     protected function zipPlugin()
@@ -137,5 +143,34 @@ class BuildPluginCommand extends ShopwareCommand
         ob_start();
         system($command);
         $this->output->writeln(ob_get_clean());
+    }
+
+    /**
+     * @return RecursiveIteratorIterator
+     */
+    private function listFilesForZip()
+    {
+        $files = new RecursiveDirectoryIterator($this->pluginDir->getPathname());
+        $filesFilter = new RecursiveCallbackFilterIterator($files, function ($item, $key, $iterator) {
+            // hide "hidden" files
+            if (strncmp($item->getFilename(), '.', 1) === 0) {
+                return false;
+            }
+
+            return true;
+        });
+
+        return new \RecursiveIteratorIterator($filesFilter);
+    }
+
+    /**
+     * @param string
+     * @param array
+     * @return bool
+     */
+    private static function lintPHPFile($filename, &$output)
+    {
+        exec(sprintf('"%s" -l "%s"', PHP_BINARY, $filename), $output, $return_var);
+        return !$return_var;
     }
 }
