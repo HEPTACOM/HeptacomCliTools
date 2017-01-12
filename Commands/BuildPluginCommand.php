@@ -50,6 +50,10 @@ class BuildPluginCommand extends ShopwareCommand
             );
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->output = $output;
@@ -72,6 +76,9 @@ class BuildPluginCommand extends ShopwareCommand
         ]);
     }
 
+    /**
+     * @throws Exception
+     */
     protected function preparePlugin()
     {
         $classLoader = new Psr4ClassLoader();
@@ -101,6 +108,9 @@ class BuildPluginCommand extends ShopwareCommand
         }
     }
 
+    /**
+     * @throws Exception
+     */
     protected function lintPlugin()
     {
         $command = 'php -l ' . $this->pluginDir->getPathname() . DIRECTORY_SEPARATOR . $this->pluginDir->getBasename() . '.php';
