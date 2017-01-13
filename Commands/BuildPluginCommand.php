@@ -13,7 +13,7 @@ use ZipArchive;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Shopware\Components\Plugin;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Shopware\Components\Plugin\XmlPluginInfoReader;
 use Shopware\Commands\ShopwareCommand;
 
@@ -77,9 +77,7 @@ class BuildPluginCommand extends ShopwareCommand
 
         $this->output->writeln([
             'Plugin built successfully.',
-            'Name: ' . $this->pluginDir->getBasename(),
-            'Version: ' . $this->pluginInfo['version'],
-            'File: ' . $this->releaseDir . DIRECTORY_SEPARATOR . $this->pluginDir->getBasename() . '_' . $this->pluginInfo['version'] . '.zip',
+            'Location: ' . $this->releaseDir . DIRECTORY_SEPARATOR . $this->pluginDir->getBasename() . '_' . $this->pluginInfo['version'] . '.zip',
         ]);
     }
 
@@ -112,16 +110,21 @@ class BuildPluginCommand extends ShopwareCommand
     protected function lintPlugin()
     {
         $phpFiles = new RegexIterator($this->listFilesForZip(), "/^.+\.php$/i", RecursiveRegexIterator::GET_MATCH);
-        
+
+        $this->output->writeln('Linting PHP files...');
+        $progress = new ProgressBar($this->output, iterator_count($phpFiles));
+
         foreach ($phpFiles as $phpFile) {
             if (!static::lintPHPFile($phpFile[0], $output)) {
                 throw new Exception(
                     sprintf('Syntax error was detected in "%s". See the following error: %s %s', $phpFile[0], PHP_EOL, $output)
                 );
             }
+            $progress->advance();
         }
 
-        $this->output->writeln('Plugin linted successfully.');
+        $progress->finish();
+        $this->output->writeln(['', 'All PHP files linted successfully.']);
     }
 
     /**
@@ -157,7 +160,12 @@ class BuildPluginCommand extends ShopwareCommand
             throw new Exception(sprintf('Could not create zip archive %s', $this->zipName));
         }
 
+        $zipMessage = [];
         $files = $this->listFilesForZip();
+
+        $this->output->writeln('Creating zip archive...');
+        $progress = new ProgressBar($this->output, iterator_count($files));
+
         /** @var SplFileInfo $file */
         foreach ($files as $file) {
             // $this->output->writeln($file->getFilename());
@@ -167,13 +175,16 @@ class BuildPluginCommand extends ShopwareCommand
             )[0];
 
             if ($zip->addFile($file->getPathname(), $localname)) {
-                $this->output->writeln(sprintf('Added file to zip archive: %s', $localname));
+                $zipMessage[] = sprintf('Added file to zip archive: %s', $localname);
+                $progress->advance();
             }
             else {
                 throw new Exception(sprintf('Could not add file to zip archive: %s', $localname));
             }
         }
 
+        $progress->finish();
+        $this->output->writeln(array_merge([''], $zipMessage));
         $zip->close();
     }
 
