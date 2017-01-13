@@ -124,6 +124,9 @@ class BuildPluginCommand extends ShopwareCommand
         $this->output->writeln('Plugin linted successfully.');
     }
 
+    /**
+     * @throws Exception
+     */
     protected function prepareZip()
     {
         if (!is_dir($this->releaseDir->getPathname()) && !mkdir($this->releaseDir->getPathname(), 0777, true)) {
@@ -143,6 +146,9 @@ class BuildPluginCommand extends ShopwareCommand
         }
     }
 
+    /**
+     * @throws Exception
+     */
     protected function createZip()
     {
         $zip = new ZipArchive;
@@ -186,8 +192,8 @@ class BuildPluginCommand extends ShopwareCommand
     }
 
     /**
-     * @param string
-     * @param array
+     * @param string $filename
+     * @param array $output
      * @return bool
      */
     private static function lintPHPFile($filename, &$output)
