@@ -19,3 +19,5 @@ plugin. The plugin must follow the new plugin structure and has to
 be located in `custom/plugins/`. Also it has to have a valid
 plugin.xml file. The built zip file will be located in
 `HeptacomBuilds/plugins/`.
+
+[![HEPTACOM-Icon](https://www.heptacom.de/fileadmin/templates/pages/heptacom/_resources/img/favicon/favicon-16x16.png) HEPTACOM Website](https://www.heptacom.de)
