@@ -195,6 +195,10 @@ class BuildPluginCommand extends ShopwareCommand
     {
         $files = new RecursiveDirectoryIterator($this->pluginDir->getPathname());
         $filesFilter = new RecursiveCallbackFilterIterator($files, function (SplFileInfo $item, $key, $iterator) {
+            // support for .swNoEncryption files
+            if ($item->getFilename() == '.swNoEncryption') {
+                return true;
+            }
             // hide "hidden" files
             return (bool) (strncmp($item->getFilename(), '.', 1) !== 0);
         });
