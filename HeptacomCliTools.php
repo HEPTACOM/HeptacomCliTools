@@ -9,6 +9,9 @@ use HeptacomCliTools\Commands;
 
 class HeptacomCliTools extends Plugin
 {
+    /**
+     * @return array
+     */
     public static function getSubscribedEvents()
     {
         return [
@@ -16,6 +19,10 @@ class HeptacomCliTools extends Plugin
         ];
     }
 
+    /**
+     * @param Enlight_Event_EventArgs $args
+     * @return ArrayCollection
+     */
     public function addCommands(Enlight_Event_EventArgs $args)
     {
         return new ArrayCollection([

@@ -44,6 +44,20 @@ class BuildPluginCommand extends ShopwareCommand
      */
     protected $pluginInfo;
 
+    /**
+     * @var array
+     */
+    protected $whitelist = [
+        '.swNoEncryption'
+    ];
+
+    /**
+     * @var array
+     */
+    protected $blacklist = [
+        'node_modules',
+    ];
+
     protected function configure()
     {
         $this->setName('heptacom:plugin:build')
@@ -168,7 +182,6 @@ class BuildPluginCommand extends ShopwareCommand
 
         /** @var SplFileInfo $file */
         foreach ($files as $file) {
-            // $this->output->writeln($file->getFilename());
             $localname = $this->pluginDir->getBasename() . DIRECTORY_SEPARATOR . sscanf(
                 $file->getPathname(),
                 $this->pluginDir->getPathname() . DIRECTORY_SEPARATOR . '%s'
@@ -195,9 +208,11 @@ class BuildPluginCommand extends ShopwareCommand
     {
         $files = new RecursiveDirectoryIterator($this->pluginDir->getPathname());
         $filesFilter = new RecursiveCallbackFilterIterator($files, function (SplFileInfo $item, $key, $iterator) {
-            // support for .swNoEncryption files
-            if ($item->getFilename() == '.swNoEncryption') {
+            if (in_array($item->getFilename(), $this->whitelist)) {
                 return true;
+            }
+            if (in_array($item->getFilename(), $this->blacklist)) {
+                return false;
             }
             // hide "hidden" files
             return (bool) (strncmp($item->getFilename(), '.', 1) !== 0);
