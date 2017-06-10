@@ -4,7 +4,6 @@ namespace HeptacomCliTools\Components;
 
 use DOMDocument;
 use DOMXPath;
-use HeptacomCliTools\Components\PluginData\MissingVersionException;
 use Iterator;
 use RecursiveCallbackFilterIterator;
 use RecursiveDirectoryIterator;
@@ -78,7 +77,6 @@ class PluginData
 
     /**
      * @return string
-     * @throws MissingVersionException
      */
     public function getVersion()
     {
@@ -88,15 +86,11 @@ class PluginData
             $pluginXmlDocument->load($this->getPluginXml()->getPathname());
             $element = (new DOMXPath($pluginXmlDocument))->query('//plugin/version');
 
-            if ($element === false || $element->length == 0) {
-                throw new MissingVersionException();
+            if ($element === false || $element->length == 0 || empty($element->item(0)->nodeValue)) {
+                return $this->version = 'undefined';
             }
 
             $this->version = $element->item(0)->nodeValue;
-
-            if (empty($this->version)) {
-                throw new MissingVersionException();
-            }
         }
 
         return $this->version;

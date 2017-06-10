@@ -5,6 +5,7 @@ namespace HeptacomCliTools\Commands;
 use HeptacomCliTools\Components\PluginBuilder;
 use HeptacomCliTools\Components\PluginBuilder\Config;
 use HeptacomCliTools\Components\PluginData;
+use HeptacomCliTools\Components\PluginLinter;
 use SplFileInfo;
 use stdClass;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -44,11 +45,11 @@ class BuildPluginCommand extends ShopwareCommand
         $state = new stdClass();
         $state->progressBar = null;
 
+        $plugin = new PluginData(new SplFileInfo($pluginDirectory));
+
         /** @var Config $config */
         $config = Config::create()
-            ->setLint(true)
-            ->setPack(true)
-            ->setPlugin(new PluginData(new SplFileInfo($pluginDirectory)))
+            ->setPlugin($plugin)
             ->setOutputDirectory(new SplFileInfo($outputDirectory))
             ->setPackBeginCallback(function ($count) use($output, $state) {
                 $output->writeln('Creating zip archive...');
@@ -60,18 +61,19 @@ class BuildPluginCommand extends ShopwareCommand
             ->setPackEndCallback(function ($message) use ($output, $state) {
                 $state->progressBar->finish();
                 $output->writeln(array_merge([''], $message));
-            })
-            ->setLintBeginCallback(function ($count) use($output, $state) {
-                $output->writeln('Linting plugin...');
-                $state->progressBar = new ProgressBar($output, $count);
-            })
-            ->setLintProgressCallback(function () use ($state) {
-                $state->progressBar->advance();
-            })
-            ->setLintEndCallback(function () use ($output, $state) {
-                $state->progressBar->finish();
-                $output->writeln(['', 'All PHP files linted successfully.']);
             });
+
+        $output->writeln('Linting plugin...');
+        PluginLinter::lint(
+            $plugin,
+            function ($count) use($output, $state) {
+                $state->progressBar = new ProgressBar($output, $count);
+            }, function () use ($state) {
+                $state->progressBar->advance();
+            }
+        );
+        $state->progressBar->finish();
+        $output->writeln(['', 'All PHP files linted successfully.']);
 
         PluginBuilder::build($config);
 

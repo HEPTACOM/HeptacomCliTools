@@ -13,16 +13,6 @@ use SplFileInfo;
 class Config
 {
     /**
-     * @var bool
-     */
-    private $lint;
-
-    /**
-     * @var bool
-     */
-    private $pack;
-
-    /**
      * @var PluginData
      */
     private $plugin;
@@ -48,62 +38,11 @@ class Config
     private $packEndCallback;
 
     /**
-     * @var Closure
-     */
-    private $lintBeginCallback;
-
-    /**
-     * @var Closure
-     */
-    private $lintProgressCallback;
-
-    /**
-     * @var Closure
-     */
-    private $lintEndCallback;
-
-    /**
      * @return Config
      */
     public static function create()
     {
         return new static();
-    }
-
-    /**
-     * @return bool
-     */
-    public function isLint()
-    {
-        return $this->lint;
-    }
-
-    /**
-     * @param bool $lint
-     * @return Config
-     */
-    public function setLint($lint)
-    {
-        $this->lint = $lint;
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isPack()
-    {
-        return $this->pack;
-    }
-
-    /**
-     * @param bool $pack
-     * @return Config
-     */
-    public function setPack($pack)
-    {
-        $this->pack = $pack;
-        return $this;
     }
 
     /**
@@ -193,60 +132,6 @@ class Config
     public function setPackEndCallback($packEndCallback)
     {
         $this->packEndCallback = $packEndCallback;
-        return $this;
-    }
-
-    /**
-     * @return Closure
-     */
-    public function getLintBeginCallback()
-    {
-        return $this->lintBeginCallback;
-    }
-
-    /**
-     * @param Closure $lintBeginCallback
-     * @return Config
-     */
-    public function setLintBeginCallback($lintBeginCallback)
-    {
-        $this->lintBeginCallback = $lintBeginCallback;
-        return $this;
-    }
-
-    /**
-     * @return Closure
-     */
-    public function getLintProgressCallback()
-    {
-        return $this->lintProgressCallback;
-    }
-
-    /**
-     * @param Closure $lintProgressCallback
-     * @return Config
-     */
-    public function setLintProgressCallback($lintProgressCallback)
-    {
-        $this->lintProgressCallback = $lintProgressCallback;
-        return $this;
-    }
-
-    /**
-     * @return Closure
-     */
-    public function getLintEndCallback()
-    {
-        return $this->lintEndCallback;
-    }
-
-    /**
-     * @param Closure $lintEndCallback
-     * @return Config
-     */
-    public function setLintEndCallback($lintEndCallback)
-    {
-        $this->lintEndCallback = $lintEndCallback;
         return $this;
     }
 }

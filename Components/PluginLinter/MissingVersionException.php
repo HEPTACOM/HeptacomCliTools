@@ -1,12 +1,12 @@
 <?php
 
-namespace HeptacomCliTools\Components\PluginData;
+namespace HeptacomCliTools\Components\PluginLinter;
 
 use Exception;
 
 /**
  * Class MissingVersionException
- * @package HeptacomCliTools\Components\PluginData
+ * @package HeptacomCliTools\Components\PluginLinter
  */
 class MissingVersionException extends Exception
 {
