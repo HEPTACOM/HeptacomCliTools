@@ -36,13 +36,19 @@ class PluginPacker
             throw new CreateDirectoryException($outputDirectory);
         }
 
-        $zipName = new SplFileInfo(implode(DIRECTORY_SEPARATOR, [
+        $zipName = implode(DIRECTORY_SEPARATOR, [
             $outputDirectory->getPathname(),
             $plugin->getName() . '_' . $plugin->getVersion() . '.zip',
-        ]));
+        ]);
 
-        if ($zipName->isFile() && unlink($zipName->getPathname())) {
-            throw new RemovePackageException($zipName);
+
+        if (is_file($zipName)) {
+            $count = 10;
+            while (!unlink($zipName) || is_file($zipName)) {
+                if (--$count === 0) {
+                    throw new RemovePackageException(new SplFileInfo($zipName));
+                }
+            }
         }
 
         $zip = new ZipArchive();
@@ -50,7 +56,7 @@ class PluginPacker
 
         try {
             if ($zip->open($zipName, ZipArchive::CREATE) !== true) {
-                throw new CreatePackageException($zipName);
+                throw new CreatePackageException(new SplFileInfo($zipName));
             }
 
             if (!is_null($beginCallback) && is_callable($beginCallback)) {
@@ -67,7 +73,7 @@ class PluginPacker
                         $progressCallback();
                     }
                 } else {
-                    throw new AppendFileToPackageException($zipName, $file);
+                    throw new AppendFileToPackageException(new SplFileInfo($zipName), $file);
                 }
             }
         } finally {
