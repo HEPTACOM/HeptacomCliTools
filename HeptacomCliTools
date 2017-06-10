@@ -1,0 +1,74 @@
+#!/usr/bin/env php
+<?php
+
+set_time_limit(0);
+
+spl_autoload_register(function($className) {
+    include_once(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $className) . ".php");
+});
+
+use HeptacomCliTools\Components\PluginData;
+use HeptacomCliTools\Components\PluginLinter;
+use HeptacomCliTools\Components\PluginPacker;
+
+function packPlugin($pluginDirectory)
+{
+    $outputDirectory = dirname($pluginDirectory);
+
+    /** @var stdClass $state */
+    $state = new stdClass();
+    $state->count = 0;
+    $state->step = 0;
+
+    $plugin = new PluginData(new SplFileInfo($pluginDirectory));
+
+    echo('Creating archive...' . PHP_EOL);
+    $archive = PluginPacker::pack(
+        $plugin,
+        new SplFileInfo($outputDirectory),
+        function ($count) use($state) {
+            $state->count = $count;
+        },
+        function () use ($state) {
+            echo('Pack ' . (++$state->step) . '/' . $state->count . PHP_EOL);
+        },
+        function ($message) use ($state) {
+            foreach (array_merge([''], $message) as $line) {
+                echo($line . PHP_EOL);
+            }
+        }
+    );
+
+    echo('Plugin packed successfully.' . PHP_EOL . "Location $archive" . PHP_EOL);
+}
+
+function lintPlugin($pluginDirectory)
+{
+    /** @var stdClass $state */
+    $state = new stdClass();
+    $state->count = 0;
+    $state->step = 0;
+
+    $plugin = new PluginData(new SplFileInfo($pluginDirectory));
+
+    echo('Linting plugin...' . PHP_EOL);
+    PluginLinter::lint(
+        $plugin,
+        function ($count) use($state) {
+            $state->count = $count;
+        },
+        function () use ($state) {
+            echo('Pack ' . (++$state->step) . '/' . $state->count . PHP_EOL);
+        }
+    );
+
+    echo('All PHP files linted successfully.' . PHP_EOL);
+}
+
+if (in_array('validate', $argv) || in_array('build', $argv)) {
+    lintPlugin(realpath($argv[2]));
+}
+
+if (in_array('pack', $argv) || in_array('build', $argv)) {
+    packPlugin(realpath($argv[2]));
+}
