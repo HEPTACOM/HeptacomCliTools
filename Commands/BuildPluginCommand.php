@@ -4,13 +4,13 @@ namespace HeptacomCliTools\Commands;
 
 use HeptacomCliTools\Components\PluginBuilder;
 use HeptacomCliTools\Components\PluginBuilder\Config;
+use HeptacomCliTools\Components\PluginData;
 use SplFileInfo;
 use stdClass;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Shopware\Components\Plugin\XmlPluginInfoReader;
 use Shopware\Commands\ShopwareCommand;
 
 /**
@@ -48,15 +48,8 @@ class BuildPluginCommand extends ShopwareCommand
         $config = Config::create()
             ->setLint(true)
             ->setPack(true)
-            ->setName($pluginName)
-            ->setPluginDirectory(new SplFileInfo($pluginDirectory))
+            ->setPlugin(new PluginData(new SplFileInfo($pluginDirectory)))
             ->setOutputDirectory(new SplFileInfo($outputDirectory))
-            ->setBlacklist([
-                'node_modules'
-            ])
-            ->setWhitelist([
-                '.swNoEncryption'
-            ])
             ->setPackBeginCallback(function ($count) use($output, $state) {
                 $output->writeln('Creating zip archive...');
                 $state->progressBar = new ProgressBar($output, $count);
@@ -80,18 +73,11 @@ class BuildPluginCommand extends ShopwareCommand
                 $output->writeln(['', 'All PHP files linted successfully.']);
             });
 
-        /** @var XmlPluginInfoReader $pluginInfoReader */
-        $pluginInfoReader = $this->getContainer()->get('shopware.plugin_xml_plugin_info_reader');
-        $pluginInfoFile = $config->getPluginDirectory()->getPathname() . DIRECTORY_SEPARATOR . 'plugin.xml';
-        $pluginInfo = $pluginInfoReader->read($pluginInfoFile);
-
-        $config->setVersion($pluginInfo['version']);
-
         PluginBuilder::build($config);
 
         $output->writeln([
             'Plugin built successfully.',
-            'Location: ' . $config->getOutputDirectory()->getPathname() . DIRECTORY_SEPARATOR . $config->getPluginDirectory()->getBasename() . '_' . $config->getVersion() . '.zip',
+            'Location: ' . $config->getOutputDirectory()->getPathname() . DIRECTORY_SEPARATOR . $config->getPlugin()->getName() . '_' . $config->getPlugin()->getVersion() . '.zip',
         ]);
     }
 }

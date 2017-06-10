@@ -3,6 +3,7 @@
 namespace HeptacomCliTools\Components\PluginBuilder;
 
 use Closure;
+use HeptacomCliTools\Components\PluginData;
 use SplFileInfo;
 
 /**
@@ -22,34 +23,14 @@ class Config
     private $pack;
 
     /**
-     * @var string
+     * @var PluginData
      */
-    private $name;
-
-    /**
-     * @var string
-     */
-    private $version;
-
-    /**
-     * @var SplFileInfo
-     */
-    private $pluginDirectory;
+    private $plugin;
 
     /**
      * @var SplFileInfo
      */
     private $outputDirectory;
-
-    /**
-     * @var array
-     */
-    private $blacklist;
-
-    /**
-     * @var array
-     */
-    private $whitelist;
 
     /**
      * @var Closure
@@ -126,56 +107,20 @@ class Config
     }
 
     /**
-     * @return string
+     * @return PluginData
      */
-    public function getName()
+    public function getPlugin()
     {
-        return $this->name;
+        return $this->plugin;
     }
 
     /**
-     * @param string $name
+     * @param PluginData $plugin
      * @return Config
      */
-    public function setName($name)
+    public function setPlugin($plugin)
     {
-        $this->name = $name;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getVersion()
-    {
-        return $this->version;
-    }
-
-    /**
-     * @param string $version
-     * @return Config
-     */
-    public function setVersion($version)
-    {
-        $this->version = $version;
-        return $this;
-    }
-
-    /**
-     * @return SplFileInfo
-     */
-    public function getPluginDirectory()
-    {
-        return $this->pluginDirectory;
-    }
-
-    /**
-     * @param SplFileInfo $pluginDirectory
-     * @return Config
-     */
-    public function setPluginDirectory(SplFileInfo $pluginDirectory)
-    {
-        $this->pluginDirectory = $pluginDirectory;
+        $this->plugin = $plugin;
         return $this;
     }
 
@@ -194,42 +139,6 @@ class Config
     public function setOutputDirectory(SplFileInfo $outputDirectory)
     {
         $this->outputDirectory = $outputDirectory;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getBlacklist()
-    {
-        return $this->blacklist;
-    }
-
-    /**
-     * @param array $blacklist
-     * @return Config
-     */
-    public function setBlacklist($blacklist)
-    {
-        $this->blacklist = $blacklist;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getWhitelist()
-    {
-        return $this->whitelist;
-    }
-
-    /**
-     * @param array $whitelist
-     * @return Config
-     */
-    public function setWhitelist($whitelist)
-    {
-        $this->whitelist = $whitelist;
         return $this;
     }
 

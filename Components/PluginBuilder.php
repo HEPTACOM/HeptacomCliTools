@@ -4,10 +4,7 @@ namespace HeptacomCliTools\Components;
 
 use Exception;
 use HeptacomCliTools\Components\PluginBuilder\Config;
-use RecursiveCallbackFilterIterator;
-use RecursiveDirectoryIterator;
 use RecursiveRegexIterator;
-use RecursiveIteratorIterator;
 use RegexIterator;
 use SplFileInfo;
 use ZipArchive;
@@ -24,28 +21,8 @@ class PluginBuilder
      */
     public static function build(Config $config)
     {
-        if (empty($config->getVersion())) {
-            throw new Exception(sprintf('No version was specified in %s', $config->getVersion()));
-        }
-
-        $files = new RecursiveDirectoryIterator($config->getPluginDirectory());
-
-        $filesFilter = new RecursiveCallbackFilterIterator($files, function (SplFileInfo $item, $key, $iterator) use ($config) {
-            if (in_array($item->getFilename(), $config->getWhitelist())) {
-                return true;
-            }
-
-            if (in_array($item->getFilename(), $config->getBlacklist())) {
-                return false;
-            }
-
-            // hide "hidden" files
-            return (bool) (strncmp($item->getFilename(), '.', 1) !== 0);
-        });
-
-        $listFilesForZip = new RecursiveIteratorIterator($filesFilter);
-
-        $phpFiles = new RegexIterator($listFilesForZip, "/^.+\.php$/i", RecursiveRegexIterator::GET_MATCH);
+        $files = $config->getPlugin()->getFiles();
+        $phpFiles = new RegexIterator($files, "/^.+\.php$/i", RecursiveRegexIterator::GET_MATCH);
 
         if ($config->isLint()) {
             static::tryCall($config->getLintBeginCallback(), iterator_count($phpFiles));
@@ -58,11 +35,12 @@ class PluginBuilder
                 static::tryCall($config->getLintProgressCallback());
             }
 
-            if (!is_file($config->getPluginDirectory()->getPathname() . DIRECTORY_SEPARATOR . $config->getName() . '.php')) {
-                throw new Exception('No bootstrap file was found in ' . $config->getPluginDirectory());
+            if (!$config->getPlugin()->getBootstrap()->isFile()) {
+                throw new Exception('No bootstrap file was found in ' . $config->getPlugin()->getDirectory());
             }
-            if (!is_file($config->getPluginDirectory()->getPathname() . DIRECTORY_SEPARATOR . 'plugin.xml')) {
-                throw new Exception('No plugin.xml file was found in ' . $config->getPluginDirectory());
+
+            if (!$config->getPlugin()->getPluginXml()->isFile()) {
+                throw new Exception('No plugin.xml file was found in ' . $config->getPlugin()->getDirectory());
             }
 
             static::tryCall($config->getLintEndCallback());
@@ -75,7 +53,7 @@ class PluginBuilder
 
             $zipName = implode(DIRECTORY_SEPARATOR, [
                 $config->getOutputDirectory()->getPathname(),
-                $config->getPluginDirectory()->getBasename() . '_' . $config->getVersion() . '.zip',
+                $config->getPlugin()->getName() . '_' . $config->getPlugin()->getVersion() . '.zip',
             ]);
 
             if (is_file($zipName) && !unlink($zipName)) {
@@ -90,12 +68,12 @@ class PluginBuilder
                     throw new Exception(sprintf('Could not create zip archive %s', $zipName));
                 }
 
-                $listFilesForZip->rewind();
-                static::tryCall($config->getPackBeginCallback(), iterator_count($listFilesForZip));
+                $files->rewind();
+                static::tryCall($config->getPackBeginCallback(), iterator_count($files));
 
                 /** @var SplFileInfo $file */
-                foreach ($listFilesForZip as $file) {
-                    $localname = $config->getPluginDirectory()->getBasename() . DIRECTORY_SEPARATOR . sscanf($file->getPathname(),$config->getPluginDirectory()->getPathname() . DIRECTORY_SEPARATOR . '%s')[0];
+                foreach ($files as $file) {
+                    $localname = $config->getPlugin()->getName() . DIRECTORY_SEPARATOR . sscanf($file->getPathname(),$config->getPlugin()->getDirectory()->getPathname() . DIRECTORY_SEPARATOR . '%s')[0];
 
                     if ($zip->addFile($file->getPathname(), $localname)) {
                         $zipMessage[] = sprintf('Added file to zip archive: %s', $localname);
