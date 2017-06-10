@@ -2,62 +2,23 @@
 
 namespace HeptacomCliTools\Commands;
 
-use Exception;
-use RecursiveCallbackFilterIterator;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-use RecursiveRegexIterator;
-use RegexIterator;
+use HeptacomCliTools\Components\PluginBuilder;
+use HeptacomCliTools\Components\PluginBuilder\Config;
 use SplFileInfo;
-use ZipArchive;
+use stdClass;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Shopware\Components\Plugin\XmlPluginInfoReader;
 use Shopware\Commands\ShopwareCommand;
 
+/**
+ * Class BuildPluginCommand
+ * @package HeptacomCliTools\Commands
+ */
 class BuildPluginCommand extends ShopwareCommand
 {
-    /**
-     * @var OutputInterface
-     */
-    protected $output;
-
-    /**
-     * @var SplFileInfo
-     */
-    protected $releaseDir;
-
-    /**
-     * @var SplFileInfo
-     */
-    protected $pluginDir;
-
-    /**
-     * @var string
-     */
-    protected $zipName;
-
-    /**
-     * @var array
-     */
-    protected $pluginInfo;
-
-    /**
-     * @var array
-     */
-    protected $whitelist = [
-        '.swNoEncryption'
-    ];
-
-    /**
-     * @var array
-     */
-    protected $blacklist = [
-        'node_modules',
-    ];
-
     protected function configure()
     {
         $this->setName('heptacom:plugin:build')
@@ -75,160 +36,62 @@ class BuildPluginCommand extends ShopwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->output = $output;
-
+        $outputDirectory = Shopware()->DocPath() . implode(DIRECTORY_SEPARATOR, ['HeptacomBuilds', 'plugins']);
         $pluginName = $input->getArgument('plugin');
+        $pluginDirectory = Shopware()->DocPath() .implode(DIRECTORY_SEPARATOR, ['custom', 'plugins', $pluginName]);
 
-        $this->releaseDir = new SplFileInfo(Shopware()->DocPath() .
-            implode(DIRECTORY_SEPARATOR, ['HeptacomBuilds', 'plugins']));
-        $this->pluginDir = new SplFileInfo(Shopware()->DocPath() .
-            implode(DIRECTORY_SEPARATOR, ['custom', 'plugins', $pluginName]));
+        /** @var stdClass $state */
+        $state = new stdClass();
+        $state->progressBar = null;
 
-        $this->lintPlugin();
-        $this->preparePlugin();
-        $this->prepareZip();
-        $this->createZip();
-
-        $this->output->writeln([
-            'Plugin built successfully.',
-            'Location: ' . $this->releaseDir . DIRECTORY_SEPARATOR . $this->pluginDir->getBasename() . '_' . $this->pluginInfo['version'] . '.zip',
-        ]);
-    }
-
-    /**
-     * @throws Exception
-     */
-    protected function preparePlugin()
-    {
-        $pluginName = $this->pluginDir->getBasename();
-        if (!is_file($this->pluginDir->getPathname() . DIRECTORY_SEPARATOR . $pluginName . '.php')) {
-            throw new Exception('No bootstrap file was found in ' . $this->pluginDir);
-        }
-        if (!is_file($this->pluginDir->getPathname() . DIRECTORY_SEPARATOR . 'plugin.xml')) {
-            throw new Exception('No plugin.xml file was found in ' . $this->pluginDir);
-        }
+        /** @var Config $config */
+        $config = Config::create()
+            ->setLint(true)
+            ->setPack(true)
+            ->setName($pluginName)
+            ->setPluginDirectory(new SplFileInfo($pluginDirectory))
+            ->setOutputDirectory(new SplFileInfo($outputDirectory))
+            ->setBlacklist([
+                'node_modules'
+            ])
+            ->setWhitelist([
+                '.swNoEncryption'
+            ])
+            ->setPackBeginCallback(function ($count) use($output, $state) {
+                $output->writeln('Creating zip archive...');
+                $state->progressBar = new ProgressBar($output, $count);
+            })
+            ->setPackProgressCallback(function () use ($state) {
+                $state->progressBar->advance();
+            })
+            ->setPackEndCallback(function ($message) use ($output, $state) {
+                $state->progressBar->finish();
+                $output->writeln(array_merge([''], $message));
+            })
+            ->setLintBeginCallback(function ($count) use($output, $state) {
+                $output->writeln('Linting plugin...');
+                $state->progressBar = new ProgressBar($output, $count);
+            })
+            ->setLintProgressCallback(function () use ($state) {
+                $state->progressBar->advance();
+            })
+            ->setLintEndCallback(function () use ($output, $state) {
+                $state->progressBar->finish();
+                $output->writeln(['', 'All PHP files linted successfully.']);
+            });
 
         /** @var XmlPluginInfoReader $pluginInfoReader */
         $pluginInfoReader = $this->getContainer()->get('shopware.plugin_xml_plugin_info_reader');
-        $pluginInfoFile = $this->pluginDir->getPathname() . DIRECTORY_SEPARATOR . 'plugin.xml';
-        $this->pluginInfo = $pluginInfoReader->read($pluginInfoFile);
+        $pluginInfoFile = $config->getPluginDirectory()->getPathname() . DIRECTORY_SEPARATOR . 'plugin.xml';
+        $pluginInfo = $pluginInfoReader->read($pluginInfoFile);
 
-        if (!array_key_exists('version', $this->pluginInfo)) {
-            throw new Exception(sprintf('No version was specified in %s', $pluginInfoFile));
-        }
-    }
+        $config->setVersion($pluginInfo['version']);
 
-    /**
-     * @throws Exception
-     */
-    protected function lintPlugin()
-    {
-        $phpFiles = new RegexIterator($this->listFilesForZip(), "/^.+\.php$/i", RecursiveRegexIterator::GET_MATCH);
+        PluginBuilder::build($config);
 
-        $this->output->writeln('Linting PHP files...');
-        $progress = new ProgressBar($this->output, iterator_count($phpFiles));
-
-        foreach ($phpFiles as $phpFile) {
-            if (!static::lintPHPFile($phpFile[0], $output)) {
-                throw new Exception(
-                    sprintf('Syntax error was detected in "%s". See the following error: %s %s', $phpFile[0], PHP_EOL, $output)
-                );
-            }
-            $progress->advance();
-        }
-
-        $progress->finish();
-        $this->output->writeln(['', 'All PHP files linted successfully.']);
-    }
-
-    /**
-     * @throws Exception
-     */
-    protected function prepareZip()
-    {
-        if (!is_dir($this->releaseDir->getPathname()) && !mkdir($this->releaseDir->getPathname(), 0777, true)) {
-            throw new Exception(sprintf('Could not create build folder at "%s"'), $this->releaseDir->getPathname());
-        }
-
-        $this->zipName = implode(DIRECTORY_SEPARATOR, [
-            $this->releaseDir->getPathname(),
-            $this->pluginDir->getBasename() . '_' . $this->pluginInfo['version'] . '.zip',
+        $output->writeln([
+            'Plugin built successfully.',
+            'Location: ' . $config->getOutputDirectory()->getPathname() . DIRECTORY_SEPARATOR . $config->getPluginDirectory()->getBasename() . '_' . $config->getVersion() . '.zip',
         ]);
-
-        if (is_file($this->zipName) && !unlink($this->zipName)) {
-            throw new Exception(sprintf(
-                'Could not remove existing zip archive %s',
-                $this->pluginDir->getBasename() . '_' . $this->pluginInfo['version'] . '.zip'
-            ));
-        }
-    }
-
-    /**
-     * @throws Exception
-     */
-    protected function createZip()
-    {
-        $zip = new ZipArchive;
-
-        if ($zip->open($this->zipName, ZipArchive::CREATE) !== true) {
-            throw new Exception(sprintf('Could not create zip archive %s', $this->zipName));
-        }
-
-        $zipMessage = [];
-        $files = $this->listFilesForZip();
-
-        $this->output->writeln('Creating zip archive...');
-        $progress = new ProgressBar($this->output, iterator_count($files));
-
-        /** @var SplFileInfo $file */
-        foreach ($files as $file) {
-            $localname = $this->pluginDir->getBasename() . DIRECTORY_SEPARATOR . sscanf(
-                $file->getPathname(),
-                $this->pluginDir->getPathname() . DIRECTORY_SEPARATOR . '%s'
-            )[0];
-
-            if ($zip->addFile($file->getPathname(), $localname)) {
-                $zipMessage[] = sprintf('Added file to zip archive: %s', $localname);
-                $progress->advance();
-            }
-            else {
-                throw new Exception(sprintf('Could not add file to zip archive: %s', $localname));
-            }
-        }
-
-        $progress->finish();
-        $this->output->writeln(array_merge([''], $zipMessage));
-        $zip->close();
-    }
-
-    /**
-     * @return RecursiveIteratorIterator
-     */
-    private function listFilesForZip()
-    {
-        $files = new RecursiveDirectoryIterator($this->pluginDir->getPathname());
-        $filesFilter = new RecursiveCallbackFilterIterator($files, function (SplFileInfo $item, $key, $iterator) {
-            if (in_array($item->getFilename(), $this->whitelist)) {
-                return true;
-            }
-            if (in_array($item->getFilename(), $this->blacklist)) {
-                return false;
-            }
-            // hide "hidden" files
-            return (bool) (strncmp($item->getFilename(), '.', 1) !== 0);
-        });
-
-        return new RecursiveIteratorIterator($filesFilter);
-    }
-
-    /**
-     * @param string $filename
-     * @param array $output
-     * @return bool
-     */
-    private static function lintPHPFile($filename, &$output)
-    {
-        exec(sprintf('"%s" -l "%s"', PHP_BINARY, $filename), $output, $return_var);
-        return !$return_var;
     }
 }
