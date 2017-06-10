@@ -27,6 +27,8 @@ class HeptacomCliTools extends Plugin
     {
         return new ArrayCollection([
             new Commands\BuildPluginCommand(),
+            new Commands\PackPluginCommand(),
+            new Commands\ValidatePluginCommand(),
             new Commands\BuildThemeCommand(),
         ]);
     }

@@ -2,12 +2,8 @@
 
 namespace HeptacomCliTools\Commands;
 
-use HeptacomCliTools\Components\PluginData;
-use HeptacomCliTools\Components\PluginLinter;
-use HeptacomCliTools\Components\PluginPacker;
-use SplFileInfo;
-use stdClass;
-use Symfony\Component\Console\Helper\ProgressBar;
+use Shopware\Components\Console\Application;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -36,46 +32,17 @@ class BuildPluginCommand extends ShopwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $outputDirectory = Shopware()->DocPath() . implode(DIRECTORY_SEPARATOR, ['HeptacomBuilds', 'plugins']);
-        $pluginDirectory = Shopware()->DocPath() . implode(DIRECTORY_SEPARATOR, ['custom', 'plugins', $input->getArgument('plugin')]);
+        $args = $input->getArguments();
+        $application = new Application(Shopware()->Container()->get('kernel'));
+        $application->setAutoExit(false);
 
-        /** @var stdClass $state */
-        $state = new stdClass();
-        $state->progressBar = null;
-
-        $plugin = new PluginData(new SplFileInfo($pluginDirectory));
-
-        $output->writeln('Linting plugin...');
-        PluginLinter::lint(
-            $plugin,
-            function ($count) use($output, $state) {
-                $state->progressBar = new ProgressBar($output, $count);
-            }, function () use ($state) {
-                $state->progressBar->advance();
-            }
+        $application->run(
+            new ArrayInput(array_merge($input->getArguments(), ['command' => (new ValidatePluginCommand())->getName()])),
+            $output
         );
-        $state->progressBar->finish();
-        $output->writeln(['', 'All PHP files linted successfully.']);
-
-        $archive = PluginPacker::pack(
-            $plugin,
-            new SplFileInfo($outputDirectory),
-            function ($count) use($output, $state) {
-                $output->writeln('Creating archive...');
-                $state->progressBar = new ProgressBar($output, $count);
-            },
-            function () use ($state) {
-                $state->progressBar->advance();
-            },
-            function ($message) use ($output, $state) {
-                $state->progressBar->finish();
-                $output->writeln(array_merge([''], $message));
-            }
+        $application->run(
+            new ArrayInput(array_merge($input->getArguments(), ['command' => (new PackPluginCommand())->getName()])),
+            $output
         );
-
-        $output->writeln([
-            'Plugin packed successfully.',
-            "Location: $archive",
-        ]);
     }
 }
