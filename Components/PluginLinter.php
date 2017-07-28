@@ -3,6 +3,7 @@
 namespace HeptacomCliTools\Components;
 
 use Closure;
+use HeptacomAmp\Components\FindsPhpExecutable;
 use HeptacomCliTools\Components\PluginLinter\MissingBootstrapException;
 use HeptacomCliTools\Components\PluginLinter\MissingPluginMetadataException;
 use HeptacomCliTools\Components\PluginLinter\MissingVersionException;
@@ -10,7 +11,6 @@ use HeptacomCliTools\Components\PluginLinter\PhpLintException;
 use RecursiveRegexIterator;
 use RegexIterator;
 use SplFileInfo;
-use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
  * Class PluginLinter
@@ -18,22 +18,7 @@ use Symfony\Component\Process\PhpExecutableFinder;
  */
 abstract class PluginLinter
 {
-    /**
-     * @var string
-     */
-    private static $phpExecutable;
-
-    /**
-     * @return string
-     */
-    private static function getPhpExecutable()
-    {
-        if (is_null(static::$phpExecutable)) {
-            static::$phpExecutable = !empty(PHP_BINARY) ? PHP_BINARY : (new PhpExecutableFinder())->find();
-        }
-
-        return static::$phpExecutable;
-    }
+    use FindsPhpExecutable;
 
     /**
      * @param PluginData $plugin
