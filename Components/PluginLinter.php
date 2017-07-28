@@ -10,13 +10,31 @@ use HeptacomCliTools\Components\PluginLinter\PhpLintException;
 use RecursiveRegexIterator;
 use RegexIterator;
 use SplFileInfo;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
  * Class PluginLinter
  * @package HeptacomCliTools\Components
  */
-class PluginLinter
+abstract class PluginLinter
 {
+    /**
+     * @var string
+     */
+    private static $phpExecutable;
+
+    /**
+     * @return string
+     */
+    private static function getPhpExecutable()
+    {
+        if (is_null(static::$phpExecutable)) {
+            static::$phpExecutable = !empty(PHP_BINARY) ? PHP_BINARY : (new PhpExecutableFinder())->find();
+        }
+
+        return static::$phpExecutable;
+    }
+
     /**
      * @param PluginData $plugin
      * @param Closure $beginCallback
@@ -61,7 +79,7 @@ class PluginLinter
      */
     private static function lintPHPFile($filename, &$output)
     {
-        exec(sprintf('"%s" -l "%s"', PHP_BINARY, $filename), $output, $return_var);
+        exec(sprintf('%s -l %s', escapeshellarg(static::getPhpExecutable()), escapeshellarg($filename)), $output, $return_var);
         return !$return_var;
     }
 }
