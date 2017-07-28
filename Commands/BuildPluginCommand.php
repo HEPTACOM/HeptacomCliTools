@@ -17,7 +17,7 @@ class BuildPluginCommand extends ShopwareCommand
 {
     protected function configure()
     {
-        $this->setName('heptacom:plugin:build')
+        $this->setName('ksk:plugin:build')
             ->setDescription('Builds a zip archive for a plugin using the new plugin structure.')
             ->addArgument(
                 'plugin',

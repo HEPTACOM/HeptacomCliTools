@@ -56,7 +56,7 @@ class Shopware_Controllers_Backend_HeptacomCliTools extends Enlight_Controller_A
         $pluginData = new PluginData(new SplFileInfo($pluginDirectory));
 
         $filename = $pluginData->getName() . '_' . $pluginData->getVersion() . '.zip';
-        $zipFile = Shopware()->DocPath() . implode(DIRECTORY_SEPARATOR, ['HeptacomBuilds', 'plugins', $filename]);
+        $zipFile = Shopware()->DocPath() . implode(DIRECTORY_SEPARATOR, ['KskBuilds', 'plugins', $filename]);
 
         if (!file_exists($zipFile)) {
             return;

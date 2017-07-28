@@ -17,7 +17,7 @@ class BuildThemeCommand extends ShopwareCommand
 
     protected function configure()
     {
-        $this->setName('heptacom:theme:build')
+        $this->setName('ksk:theme:build')
             ->setDescription('Builds a zip file for a theme using the new template structure.')
             ->addArgument(
                 'theme',

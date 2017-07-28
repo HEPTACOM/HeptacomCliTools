@@ -20,7 +20,7 @@ class PackPluginCommand extends ShopwareCommand
 {
     protected function configure()
     {
-        $this->setName('heptacom:plugin:pack')
+        $this->setName('ksk:plugin:pack')
             ->setDescription('Builds a zip archive for a plugin using the new plugin structure.')
             ->addArgument(
                 'plugin',
@@ -35,7 +35,7 @@ class PackPluginCommand extends ShopwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $outputDirectory = Shopware()->DocPath() . implode(DIRECTORY_SEPARATOR, ['HeptacomBuilds', 'plugins']);
+        $outputDirectory = Shopware()->DocPath() . implode(DIRECTORY_SEPARATOR, ['KskBuilds', 'plugins']);
         $pluginDirectory = Shopware()->DocPath() . implode(DIRECTORY_SEPARATOR, ['custom', 'plugins', $input->getArgument('plugin')]);
 
         /** @var stdClass $state */

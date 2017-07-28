@@ -20,7 +20,7 @@ class ValidatePluginCommand extends ShopwareCommand
 {
     protected function configure()
     {
-        $this->setName('heptacom:plugin:validate')
+        $this->setName('ksk:plugin:validate')
             ->setDescription('Validates a given plugin.')
             ->addArgument(
                 'plugin',
