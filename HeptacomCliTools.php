@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Enlight_Event_EventArgs;
 use Shopware\Components\Plugin;
 use HeptacomCliTools\Commands;
+use Shopware_Controllers_Backend_PluginManager;
 
 class HeptacomCliTools extends Plugin
 {
@@ -15,7 +16,8 @@ class HeptacomCliTools extends Plugin
     public static function getSubscribedEvents()
     {
         return [
-            'Shopware_Console_Add_Command' => 'addCommands'
+            'Shopware_Console_Add_Command' => 'addCommands',
+            'Enlight_Controller_Action_PostDispatchSecure_Backend_PluginManager' => 'addDownloadButton',
         ];
     }
 
@@ -31,5 +33,21 @@ class HeptacomCliTools extends Plugin
             new Commands\ValidatePluginCommand(),
             new Commands\BuildThemeCommand(),
         ]);
+    }
+
+    /**
+     * @param Enlight_Event_EventArgs $args
+     */
+    public function addDownloadButton(Enlight_Event_EventArgs $args)
+    {
+        /** @var Shopware_Controllers_Backend_PluginManager $controller */
+        $controller = $args->get('subject');
+
+        if ($controller->Request()->getActionName() !== 'load') {
+            return;
+        }
+
+        $controller->View()->addTemplateDir(implode(DIRECTORY_SEPARATOR, [$this->getPath(), 'Resources', 'views']));
+        $controller->View()->extendsTemplate(implode(DIRECTORY_SEPARATOR, ['backend', 'heptacom_cli_tools', 'view', 'list', 'download-button.js']));
     }
 }
