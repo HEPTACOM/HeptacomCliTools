@@ -1,5 +1,6 @@
 <?php
 
+use HeptacomCliTools\Commands\BuildPluginCommand;
 use HeptacomCliTools\Components\PluginData;
 use Shopware\Components\Console\Application;
 use Shopware\Components\CSRFWhitelistAware;
@@ -48,7 +49,7 @@ class Shopware_Controllers_Backend_HeptacomCliTools extends Enlight_Controller_A
         $output = new BufferedOutput();
 
         $this->application->run(
-            new ArrayInput(['command' => 'heptacom:plugin:build', 'plugin' => $plugin]),
+            new ArrayInput(['command' => (new BuildPluginCommand())->getName(), 'plugin' => $plugin]),
             $output
         );
 
