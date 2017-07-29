@@ -1,12 +1,12 @@
 <?php
 
-namespace HeptacomAmp\Components;
+namespace HeptacomCliTools\Components;
 
 use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
  * Trait FindsPhpExecutable
- * @package HeptacomAmp\Components
+ * @package HeptacomCliTools\Components
  */
 trait FindsPhpExecutable
 {

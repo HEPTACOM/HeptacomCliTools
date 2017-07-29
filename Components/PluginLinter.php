@@ -3,7 +3,6 @@
 namespace HeptacomCliTools\Components;
 
 use Closure;
-use HeptacomAmp\Components\FindsPhpExecutable;
 use HeptacomCliTools\Components\PluginLinter\MissingBootstrapException;
 use HeptacomCliTools\Components\PluginLinter\MissingPluginMetadataException;
 use HeptacomCliTools\Components\PluginLinter\MissingVersionException;
