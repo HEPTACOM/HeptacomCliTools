@@ -2,6 +2,7 @@
 
 namespace HeptacomCliTools\Components;
 
+use CallbackFilterIterator;
 use DOMDocument;
 use DOMXPath;
 use Iterator;
@@ -117,5 +118,16 @@ class PluginData
         });
 
         return new RecursiveIteratorIterator($filesFilter);
+    }
+
+    /**
+     * @return Iterator
+     */
+    public function getComposerFiles()
+    {
+        return new CallbackFilterIterator($this->getFiles(), function (SplFileInfo $item, $key, $iterator) {
+            return strcasecmp($item->getFilename(), 'composer.json') === 0
+                && stripos($item->getPath(), DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR) === false;
+        });
     }
 }
