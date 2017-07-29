@@ -37,6 +37,10 @@ class BuildPluginCommand extends ShopwareCommand
         $application->setAutoExit(false);
 
         $application->run(
+            new ArrayInput(array_merge($input->getArguments(), ['command' => (new InstallDependenciesCommand())->getName()])),
+            $output
+        );
+        $application->run(
             new ArrayInput(array_merge($input->getArguments(), ['command' => (new ValidatePluginCommand())->getName()])),
             $output
         );

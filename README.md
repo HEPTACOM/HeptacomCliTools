@@ -12,6 +12,11 @@ to come that we find useful for developers.
 
 ## Available Commands
 
+```ksk:plugin:dependencies <plugin>```
+
+This installs all dependencies of the plugin. Currently supported
+dependencies are composer packages.
+
 ```ksk:plugin:validate <plugin>```
 
 This lints all php files. The plugin must follow the new
@@ -27,9 +32,10 @@ be located in `HeptacomBuilds/plugins/`.
 
 ```ksk:plugin:build <plugin>```
 
-This lints all php files and creates a zip file of the given plugin.
-The plugin must follow the new plugin structure and has to be located
-in `custom/plugins/`. Also it has to have a valid plugin.xml file.
-The built zip file will be located in `HeptacomBuilds/plugins/`.
+This installs all dependencies, lints all php files and creates a zip
+file of the given plugin. The plugin must follow the new plugin
+structure and has to be located in `custom/plugins/`. Also it has to
+have a valid plugin.xml file. The built zip file will be located in
+`KskBuilds/plugins/`.
 
 [KSK-Agentur Website](https://www.ksk-agentur.de)

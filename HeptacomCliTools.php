@@ -32,6 +32,7 @@ class HeptacomCliTools extends Plugin
             new Commands\PackPluginCommand(),
             new Commands\ValidatePluginCommand(),
             new Commands\BuildThemeCommand(),
+            new Commands\InstallDependenciesCommand(),
         ]);
     }
 

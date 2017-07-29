@@ -7,6 +7,7 @@ spl_autoload_register(function($className) {
     include_once(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $className) . ".php");
 });
 
+use HeptacomCliTools\Components\ComposerInstaller;
 use HeptacomCliTools\Components\PluginData;
 use HeptacomCliTools\Components\PluginLinter;
 use HeptacomCliTools\Components\PluginPacker;
@@ -63,6 +64,27 @@ function lintPlugin($pluginDirectory)
     );
 
     echo('All PHP files linted successfully.' . PHP_EOL);
+}
+
+function installDependencies($pluginDirectory)
+{
+    $plugin = new PluginData(new SplFileInfo($pluginDirectory));
+
+    foreach ($plugin->getComposerFiles() as $composerFile) {
+        echo("Install composer dependencies {$composerFile->getPathname()} ..." . PHP_EOL);
+        if (ComposerInstaller::install($composerFile->getPathname(), $outputComposer)) {
+            echo($outputComposer . PHP_EOL);
+        } else {
+            echo($outputComposer . PHP_EOL . PHP_EOL . 'An error occured while installing dependencies.' . PHP_EOL);
+            return;
+        }
+    }
+
+    echo(PHP_EOL . 'All dependencies where installed.' . PHP_EOL);
+}
+
+if (in_array('dependencies', $argv) || in_array('build', $argv)) {
+    installDependencies(realpath($argv[2]));
 }
 
 if (in_array('validate', $argv) || in_array('build', $argv)) {
