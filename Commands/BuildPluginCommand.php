@@ -32,7 +32,6 @@ class BuildPluginCommand extends ShopwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $args = $input->getArguments();
         $application = new Application(Shopware()->Container()->get('kernel'));
         $application->setAutoExit(false);
 
