@@ -26,4 +26,15 @@ trait FindsPhpExecutable
 
         return static::$phpExecutable;
     }
+
+    /**
+     * @param array $arguments
+     * @return string
+     */
+    protected static function getPhpCommandline(array $arguments)
+    {
+        array_unshift($arguments, static::getPhpExecutable());
+        array_map('escapeshellarg', $arguments);
+        return join(' ', $arguments);
+    }
 }

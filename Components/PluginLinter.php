@@ -63,7 +63,7 @@ abstract class PluginLinter
      */
     private static function lintPHPFile($filename, &$output)
     {
-        exec(sprintf('%s -l %s', escapeshellarg(static::getPhpExecutable()), escapeshellarg($filename)), $output, $return_var);
+        exec(static::getPhpCommandline(['-l', $filename]), $output, $return_var);
         return !$return_var;
     }
 }
