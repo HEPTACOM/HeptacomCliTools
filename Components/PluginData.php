@@ -19,6 +19,8 @@ class PluginData
 {
     const BLACKLIST = [
         'node_modules',
+        'composer.phar',
+        'composer.lock',
     ];
 
     const WHITELIST = [
