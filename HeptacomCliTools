@@ -59,7 +59,7 @@ function lintPlugin($pluginDirectory)
             $state->count = $count;
         },
         function () use ($state) {
-            echo('Pack ' . (++$state->step) . '/' . $state->count . PHP_EOL);
+            echo("Lint " . (++$state->step) . '/' . $state->count . PHP_EOL);
         }
     );
 

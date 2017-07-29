@@ -6,9 +6,9 @@ plugins into an upload-ready zip-file. Also a second command is
 under development to enable a similar build process for custom
 themes.
 
-The goal of those two commands is to speed up the build process
-of plugins and themes. However there are probably more commands
-to come that we find useful for developers.
+The goal of those commands is to speed up the build process of
+plugins and themes. However there are probably more commands to come
+that we find useful for developers.
 
 ## Available Commands
 
@@ -28,7 +28,7 @@ it has to have a valid plugin.xml file.
 This creates a zip file of the given plugin. The plugin must follow
 the new plugin structure and has to be located in `custom/plugins/`.
 Also it has to have a valid plugin.xml file. The built zip file will
-be located in `HeptacomBuilds/plugins/`.
+be located in `KskBuilds/plugins/`.
 
 ```ksk:plugin:build <plugin>```
 
