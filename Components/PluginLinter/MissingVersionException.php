@@ -1,13 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace HeptacomCliTools\Components\PluginLinter;
 
 use Exception;
 
-/**
- * Class MissingVersionException
- * @package HeptacomCliTools\Components\PluginLinter
- */
 class MissingVersionException extends Exception
 {
     /**
@@ -15,6 +11,6 @@ class MissingVersionException extends Exception
      */
     public function __toString()
     {
-        return "The version information is not preset.";
+        return 'The version information is not preset.';
     }
 }

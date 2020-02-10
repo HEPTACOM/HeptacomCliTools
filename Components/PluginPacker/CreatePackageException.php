@@ -1,14 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace HeptacomCliTools\Components\PluginPacker;
 
 use Exception;
 use SplFileInfo;
 
-/**
- * Class CreatePackageException
- * @package HeptacomCliTools\Components\PluginPacker
- */
 class CreatePackageException extends Exception
 {
     /**
@@ -16,21 +12,9 @@ class CreatePackageException extends Exception
      */
     private $packageFile;
 
-    /**
-     * CreatePackageException constructor.
-     * @param SplFileInfo $packageFile
-     */
     public function __construct(SplFileInfo $packageFile)
     {
         $this->packageFile = $packageFile;
-    }
-
-    /**
-     * @return SplFileInfo
-     */
-    public function getPackageFile()
-    {
-        return $this->packageFile;
     }
 
     /**
@@ -39,5 +23,13 @@ class CreatePackageException extends Exception
     public function __toString()
     {
         return "Could not create zip archive {$this->getPackageFile()}";
+    }
+
+    /**
+     * @return SplFileInfo
+     */
+    public function getPackageFile()
+    {
+        return $this->packageFile;
     }
 }

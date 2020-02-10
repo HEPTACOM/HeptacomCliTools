@@ -1,35 +1,17 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace HeptacomCliTools\Components;
 
 use InvalidArgumentException;
 use SplFileInfo;
 
-/**
- * Class ComposerInstaller
- * @package HeptacomCliTools\Components
- */
 abstract class ComposerInstaller
 {
     use FindsPhpExecutable;
 
     /**
-     * @return SplFileInfo
-     */
-    private static function getComposerPath()
-    {
-        $composerPath = new SplFileInfo('./composer.phar');
-
-        if (!$composerPath->isFile()) {
-            copy('https://getcomposer.org/composer.phar', $composerPath->getPathname());
-        }
-
-        return $composerPath;
-    }
-
-    /**
      * @param string $composerJson
-     * @param $output
+     * @param mixed  $output
      */
     public static function install($composerJson, &$output)
     {
@@ -44,5 +26,19 @@ abstract class ComposerInstaller
         exec(static::getPhpCommandline([static::getComposerPath(), 'install', '--no-dev', '-n', '-d', dirname($composerJson)]), $output, $return_var);
 
         return !$return_var;
+    }
+
+    /**
+     * @return SplFileInfo
+     */
+    private static function getComposerPath()
+    {
+        $composerPath = new SplFileInfo('./composer.phar');
+
+        if (!$composerPath->isFile()) {
+            copy('https://getcomposer.org/composer.phar', $composerPath->getPathname());
+        }
+
+        return $composerPath;
     }
 }

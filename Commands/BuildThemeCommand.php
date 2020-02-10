@@ -1,12 +1,12 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace HeptacomCliTools\Commands;
 
+use Shopware\Commands\ShopwareCommand;
 use SplFileInfo;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Shopware\Commands\ShopwareCommand;
 
 class BuildThemeCommand extends ShopwareCommand
 {

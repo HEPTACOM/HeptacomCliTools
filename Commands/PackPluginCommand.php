@@ -1,21 +1,17 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace HeptacomCliTools\Commands;
 
 use HeptacomCliTools\Components\PluginData;
 use HeptacomCliTools\Components\PluginPacker;
+use Shopware\Commands\ShopwareCommand;
 use SplFileInfo;
 use stdClass;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Shopware\Commands\ShopwareCommand;
 
-/**
- * Class PackPluginCommand
- * @package HeptacomCliTools\Commands
- */
 class PackPluginCommand extends ShopwareCommand
 {
     protected function configure()
@@ -29,10 +25,6 @@ class PackPluginCommand extends ShopwareCommand
             );
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $outputDirectory = Shopware()->DocPath() . implode(DIRECTORY_SEPARATOR, ['KskBuilds', 'plugins']);
@@ -47,7 +39,7 @@ class PackPluginCommand extends ShopwareCommand
         $archive = PluginPacker::pack(
             $plugin,
             new SplFileInfo($outputDirectory),
-            function ($count) use($output, $state) {
+            function ($count) use ($output, $state) {
                 $output->writeln('Creating archive...');
                 $state->progressBar = new ProgressBar($output, $count);
             },

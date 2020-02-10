@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace HeptacomCliTools\Components;
 
@@ -11,16 +11,11 @@ use RecursiveRegexIterator;
 use RegexIterator;
 use SplFileInfo;
 
-/**
- * Class PluginLinter
- * @package HeptacomCliTools\Components
- */
 abstract class PluginLinter
 {
     use FindsPhpExecutable;
 
     /**
-     * @param PluginData $plugin
      * @param Closure $beginCallback
      * @param Closure $progressCallback
      */
@@ -58,12 +53,14 @@ abstract class PluginLinter
 
     /**
      * @param string $filename
-     * @param array $output
+     * @param array  $output
+     *
      * @return bool
      */
     private static function lintPHPFile($filename, &$output)
     {
         exec(static::getPhpCommandline(['-l', $filename]), $output, $return_var);
+
         return !$return_var;
     }
 }

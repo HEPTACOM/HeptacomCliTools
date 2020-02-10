@@ -1,13 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace HeptacomCliTools\Components;
 
 use Symfony\Component\Process\PhpExecutableFinder;
 
-/**
- * Trait FindsPhpExecutable
- * @package HeptacomCliTools\Components
- */
 trait FindsPhpExecutable
 {
     /**
@@ -28,13 +24,13 @@ trait FindsPhpExecutable
     }
 
     /**
-     * @param array $arguments
      * @return string
      */
     protected static function getPhpCommandline(array $arguments)
     {
         array_unshift($arguments, static::getPhpExecutable());
         array_map('escapeshellarg', $arguments);
+
         return join(' ', $arguments);
     }
 }

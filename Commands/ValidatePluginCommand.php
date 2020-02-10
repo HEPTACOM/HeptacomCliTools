@@ -1,21 +1,17 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace HeptacomCliTools\Commands;
 
 use HeptacomCliTools\Components\PluginData;
 use HeptacomCliTools\Components\PluginLinter;
+use Shopware\Commands\ShopwareCommand;
 use SplFileInfo;
 use stdClass;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Shopware\Commands\ShopwareCommand;
 
-/**
- * Class ValidatePluginCommand
- * @package HeptacomCliTools\Commands
- */
 class ValidatePluginCommand extends ShopwareCommand
 {
     protected function configure()
@@ -29,10 +25,6 @@ class ValidatePluginCommand extends ShopwareCommand
             );
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $pluginDirectory = Shopware()->DocPath() . implode(DIRECTORY_SEPARATOR, ['custom', 'plugins', $input->getArgument('plugin')]);
@@ -46,11 +38,11 @@ class ValidatePluginCommand extends ShopwareCommand
         $output->writeln('Linting plugin...');
         PluginLinter::lint(
             $plugin,
-            function ($count) use($output, $state) {
+            function ($count) use ($output, $state) {
                 $state->progressBar = new ProgressBar($output, $count);
             }, function () use ($state) {
-            $state->progressBar->advance();
-        }
+                $state->progressBar->advance();
+            }
         );
         $state->progressBar->finish();
         $output->writeln(['', 'All PHP files linted successfully.']);

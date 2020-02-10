@@ -1,14 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace HeptacomCliTools\Components\PluginLinter;
 
 use Exception;
 use SplFileInfo;
 
-/**
- * Class PhpLintException
- * @package HeptacomCliTools\Components\PluginLinter
- */
 class PhpLintException extends Exception
 {
     /**
@@ -17,8 +13,6 @@ class PhpLintException extends Exception
     private $phpFile;
 
     /**
-     * PhpLintException constructor.
-     * @param SplFileInfo $phpFile
      * @param int $message
      */
     public function __construct(SplFileInfo $phpFile, $message)
@@ -28,18 +22,18 @@ class PhpLintException extends Exception
     }
 
     /**
-     * @return SplFileInfo
-     */
-    public function getPhpFile()
-    {
-        return $this->phpFile;
-    }
-
-    /**
      * @return string
      */
     public function __toString()
     {
         return "Syntax error was detected in {$this->getPhpFile()}. See the following error: " . PHP_EOL . " {$this->getMessage()}";
+    }
+
+    /**
+     * @return SplFileInfo
+     */
+    public function getPhpFile()
+    {
+        return $this->phpFile;
     }
 }

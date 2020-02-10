@@ -1,19 +1,15 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace HeptacomCliTools\Commands;
 
 use HeptacomCliTools\Components\ComposerInstaller;
 use HeptacomCliTools\Components\PluginData;
+use Shopware\Commands\ShopwareCommand;
 use SplFileInfo;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Shopware\Commands\ShopwareCommand;
 
-/**
- * Class InstallDependenciesCommand
- * @package HeptacomCliTools\Commands
- */
 class InstallDependenciesCommand extends ShopwareCommand
 {
     protected function configure()
@@ -27,10 +23,6 @@ class InstallDependenciesCommand extends ShopwareCommand
             );
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $pluginDirectory = Shopware()->DocPath() . implode(DIRECTORY_SEPARATOR, ['custom', 'plugins', $input->getArgument('plugin')]);
@@ -44,6 +36,7 @@ class InstallDependenciesCommand extends ShopwareCommand
             } else {
                 $output->writeln($outputComposer);
                 $output->writeln(['', 'An error occured while installing dependencies.']);
+
                 return;
             }
         }

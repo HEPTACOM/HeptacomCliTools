@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/5.2/engine/Shopware/Components/Plugin/schema/plugin.xsd">
+    <label lang="en">CLI tools</label>
+    <label lang="de">Kommandozeilenwerkzeuge</label>
+    <version>1.0.0</version>
+
+    <link>https://www.heptacom.de/</link>
+    <author>HEPTACOM GmbH</author>
+    <compatibility minVersion="5.2.0" />
+
+    <changelog version="1.0.0">
+        <changes lang="en">Add ksk:plugin:dependencies</changes>
+        <changes lang="de">ksk:plugin:dependencies hinzugefügt</changes>
+        <changes lang="en">Add ksk:plugin:validate</changes>
+        <changes lang="de">ksk:plugin:validate hinzugefügt</changes>
+        <changes lang="en">Add ksk:plugin:pack</changes>
+        <changes lang="de">ksk:plugin:pack hinzugefügt</changes>
+        <changes lang="en">Add ksk:plugin:build</changes>
+        <changes lang="de">ksk:plugin:build hinzugefügt</changes>
+    </changelog>
+</plugin>

@@ -1,14 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace HeptacomCliTools\Components\PluginPacker;
 
 use Exception;
 use SplFileInfo;
 
-/**
- * Class CreateDirectoryException
- * @package HeptacomCliTools\Components\PluginPacker
- */
 class CreateDirectoryException extends Exception
 {
     /**
@@ -16,18 +12,6 @@ class CreateDirectoryException extends Exception
      */
     private $directory;
 
-    /**
-     * @return SplFileInfo
-     */
-    public function getDirectory()
-    {
-        return $this->directory;
-    }
-
-    /**
-     * CreateDirectoryException constructor.
-     * @param SplFileInfo $directory
-     */
     public function __construct(SplFileInfo $directory)
     {
         $this->directory = $directory;
@@ -39,5 +23,13 @@ class CreateDirectoryException extends Exception
     public function __toString()
     {
         return "Could not create folder: {$this->getDirectory()}";
+    }
+
+    /**
+     * @return SplFileInfo
+     */
+    public function getDirectory()
+    {
+        return $this->directory;
     }
 }

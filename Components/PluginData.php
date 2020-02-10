@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace HeptacomCliTools\Components;
 
@@ -11,10 +11,6 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
 
-/**
- * Class PluginData
- * @package HeptacomCliTools\Components
- */
 class PluginData
 {
     const BLACKLIST = [
@@ -37,10 +33,6 @@ class PluginData
      */
     private $version = null;
 
-    /**
-     * PluginData constructor.
-     * @param SplFileInfo $directory
-     */
     public function __construct(SplFileInfo $directory)
     {
         $this->directory = $directory;

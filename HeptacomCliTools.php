@@ -1,11 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace HeptacomCliTools;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Enlight_Event_EventArgs;
 use Shopware\Components\Plugin;
-use HeptacomCliTools\Commands;
 use Shopware_Controllers_Backend_PluginManager;
 
 class HeptacomCliTools extends Plugin
@@ -22,7 +21,6 @@ class HeptacomCliTools extends Plugin
     }
 
     /**
-     * @param Enlight_Event_EventArgs $args
      * @return ArrayCollection
      */
     public function addCommands(Enlight_Event_EventArgs $args)
@@ -36,9 +34,6 @@ class HeptacomCliTools extends Plugin
         ]);
     }
 
-    /**
-     * @param Enlight_Event_EventArgs $args
-     */
     public function addDownloadButton(Enlight_Event_EventArgs $args)
     {
         /** @var Shopware_Controllers_Backend_PluginManager $controller */

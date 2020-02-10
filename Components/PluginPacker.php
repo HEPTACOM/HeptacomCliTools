@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace HeptacomCliTools\Components;
 
@@ -10,23 +10,19 @@ use HeptacomCliTools\Components\PluginPacker\RemovePackageException;
 use SplFileInfo;
 use ZipArchive;
 
-/**
- * Class PluginPacker
- * @package HeptacomCliTools\Components
- */
 class PluginPacker
 {
     /**
-     * @param PluginData $plugin
-     * @param SplFileInfo $outputDirectory
      * @param Closure $beginCallback
      * @param Closure $progressCallback
      * @param Closure $endCallback
-     * @return SplFileInfo
+     *
      * @throws AppendFileToPackageException
      * @throws CreateDirectoryException
      * @throws CreatePackageException
      * @throws RemovePackageException
+     *
+     * @return SplFileInfo
      */
     public static function pack(PluginData $plugin, SplFileInfo $outputDirectory, Closure $beginCallback = null, Closure $progressCallback = null, Closure $endCallback = null)
     {
@@ -40,7 +36,6 @@ class PluginPacker
             $outputDirectory->getPathname(),
             $plugin->getName() . '_' . $plugin->getVersion() . '.zip',
         ]);
-
 
         if (is_file($zipName)) {
             $count = 10;
@@ -65,7 +60,7 @@ class PluginPacker
 
             /** @var SplFileInfo $file */
             foreach ($files as $file) {
-                $localname = $plugin->getName() . DIRECTORY_SEPARATOR . sscanf($file->getPathname(),$plugin->getDirectory()->getPathname() . DIRECTORY_SEPARATOR . '%s')[0];
+                $localname = $plugin->getName() . DIRECTORY_SEPARATOR . sscanf($file->getPathname(), $plugin->getDirectory()->getPathname() . DIRECTORY_SEPARATOR . '%s')[0];
 
                 if ($zip->addFile($file->getPathname(), $localname)) {
                     $zipMessage[] = sprintf('Added file to zip archive: %s', $localname);

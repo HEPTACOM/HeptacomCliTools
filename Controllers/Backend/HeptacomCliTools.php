@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 use HeptacomCliTools\Commands\BuildPluginCommand;
 use HeptacomCliTools\Components\PluginData;

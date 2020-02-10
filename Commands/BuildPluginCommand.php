@@ -1,18 +1,14 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace HeptacomCliTools\Commands;
 
+use Shopware\Commands\ShopwareCommand;
 use Shopware\Components\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Shopware\Commands\ShopwareCommand;
 
-/**
- * Class BuildPluginCommand
- * @package HeptacomCliTools\Commands
- */
 class BuildPluginCommand extends ShopwareCommand
 {
     protected function configure()
@@ -26,10 +22,6 @@ class BuildPluginCommand extends ShopwareCommand
             );
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $application = new Application(Shopware()->Container()->get('kernel'));
